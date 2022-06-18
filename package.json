@@ -1,0 +1,14 @@
+{
+  "name": "com.hryooba.library.tuio",
+  "displayName": "HRYoobaLibrary.TUIO",
+  "version": "1.0.0",
+  "unity": "2021.2",
+  "description": "Unity HRYooba Library\nTUIO",
+  "author": {
+    "name": "HRYooba"
+  },
+  "type": "library",
+  "dependencies": {
+    "com.neuecc.unirx": "7.1.0"
+  }
+}

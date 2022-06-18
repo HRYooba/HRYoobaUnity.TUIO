@@ -1,7 +1,7 @@
 {
   "name": "com.hryooba.library.tuio",
   "displayName": "HRYoobaLibrary.TUIO",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "unity": "2021.2",
   "description": "Unity HRYooba Library\nTUIO",
   "author": {

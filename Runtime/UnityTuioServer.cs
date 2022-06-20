@@ -25,9 +25,9 @@ namespace HRYooba.Library.Network
         private Subject<TuioPointData> _onPointRemoved = new Subject<TuioPointData>();
 
         public IReadOnlyList<TuioPointData> PointDatas => _pointDatas.Values.ToList();
-        public IObservable<TuioPointData> OnPointAdded => _onPointAdded;
-        public IObservable<TuioPointData> OnPointUpdated => _onPointUpdated;
-        public IObservable<TuioPointData> OnPointRemoved => _onPointRemoved;
+        public IObservable<TuioPointData> OnPointAdded => _onPointAdded.ObserveOnMainThread();
+        public IObservable<TuioPointData> OnPointUpdated => _onPointUpdated.ObserveOnMainThread();
+        public IObservable<TuioPointData> OnPointRemoved => _onPointRemoved.ObserveOnMainThread();
 
         public UnityTuioServer()
         {
@@ -41,9 +41,9 @@ namespace HRYooba.Library.Network
             _objectProcessor.ObjectUpdated += OnObjectUpdated;
             _objectProcessor.ObjectRemoved += OnObjectRemoved;
 
-            _onPointAdded.Subscribe(AddPointData).AddTo(_disposables);
-            _onPointUpdated.Subscribe(UpdatePointData).AddTo(_disposables);
-            _onPointRemoved.Subscribe(RemovePointData).AddTo(_disposables);
+            OnPointAdded.Subscribe(AddPointData).AddTo(_disposables);
+            OnPointUpdated.Subscribe(UpdatePointData).AddTo(_disposables);
+            OnPointRemoved.Subscribe(RemovePointData).AddTo(_disposables);
         }
 
         ~UnityTuioServer()

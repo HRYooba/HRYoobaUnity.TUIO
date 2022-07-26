@@ -2,7 +2,12 @@
 https://github.com/valyard/TUIOsharp  
 こちらのリポジトリを参考に作成
 ## 1.インストール
-`https://github.com/HRYooba/HRYoobaUnityLibrary.TUIO.git`
+ProjectSetting/PackageManagerから以下のScopeRegistriesを設定
+- Name: `package.openupm.com`
+- URL: `https://package.openupm.com`
+- Scope: `com.hryooba.library`
+
+PackageManagerからMyRegistriesを選択しパッケージを入れる。
 
 ## 2.依存ライブラリ
 以下のスコープを追加してください。

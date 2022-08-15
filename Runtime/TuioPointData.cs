@@ -15,7 +15,7 @@ namespace HRYooba.Library.Network
             Position = position;
         }
 
-        public void UpdatePosition(Vector2 position)
+        internal void UpdatePosition(Vector2 position)
         {
             Position = position;
         }

@@ -18,13 +18,13 @@ namespace HRYooba.Library.Network
         private CursorProcessor _cursorProcessor = new CursorProcessor();
         private ObjectProcessor _objectProcessor = new ObjectProcessor();
 
-        private Dictionary<int, TuioPointData> _pointDatas = new Dictionary<int, TuioPointData>();
+        private Dictionary<int, TuioPointData> _pointDataList = new Dictionary<int, TuioPointData>();
 
         private Subject<TuioPointData> _onPointAdded = new Subject<TuioPointData>();
         private Subject<TuioPointData> _onPointUpdated = new Subject<TuioPointData>();
         private Subject<TuioPointData> _onPointRemoved = new Subject<TuioPointData>();
 
-        public IReadOnlyList<TuioPointData> PointDatas => _pointDatas.Values.ToList();
+        public IReadOnlyList<TuioPointData> PointDataList => _pointDataList.Values.ToList();
         public IObservable<TuioPointData> OnPointAdded => _onPointAdded.ObserveOnMainThread();
         public IObservable<TuioPointData> OnPointUpdated => _onPointUpdated.ObserveOnMainThread();
         public IObservable<TuioPointData> OnPointRemoved => _onPointRemoved.ObserveOnMainThread();
@@ -94,15 +94,15 @@ namespace HRYooba.Library.Network
             _onPointRemoved.Dispose();
             _onPointRemoved = null;
 
-            _pointDatas.Clear();
-            _pointDatas = null;
+            _pointDataList.Clear();
+            _pointDataList = null;
         }
 
         private void AddPointData(TuioPointData pointData)
         {
             try
             {
-                _pointDatas.Add(pointData.Id, pointData);
+                _pointDataList.Add(pointData.Id, pointData);
             }
             catch (ArgumentException e)
             {
@@ -112,12 +112,12 @@ namespace HRYooba.Library.Network
 
         private void UpdatePointData(TuioPointData pointData)
         {
-            _pointDatas[pointData.Id].UpdatePosition(pointData.Position);
+            _pointDataList[pointData.Id].UpdatePosition(pointData.Position);
         }
 
         private void RemovePointData(TuioPointData pointData)
         {
-            _pointDatas.Remove(pointData.Id);
+            _pointDataList.Remove(pointData.Id);
         }
 
         #region Blob

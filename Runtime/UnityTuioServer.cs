@@ -107,17 +107,33 @@ namespace HRYooba.Library.Network
             catch (ArgumentException e)
             {
                 Debug.LogWarning($"[UnityTuioServer]: ID[{pointData.Id}] that already exists is about to be added.\n{e}");
+                throw e;
             }
         }
 
         private void UpdatePointData(TuioPointData pointData)
         {
-            _points[pointData.Id].UpdatePosition(pointData.Position);
+            try
+            {
+                _points[pointData.Id].UpdatePosition(pointData.Position);
+            }
+            catch (KeyNotFoundException e)
+            {
+                Debug.LogWarning($"[UnityTuioServer]: ID[{pointData.Id}] not found.\n{e}");
+                throw e;
+            }
         }
 
         private void RemovePointData(TuioPointData pointData)
         {
-            _points.Remove(pointData.Id);
+            try
+            {
+                _points.Remove(pointData.Id);
+            }
+            catch
+            {
+                throw;
+            }
         }
 
         #region Blob

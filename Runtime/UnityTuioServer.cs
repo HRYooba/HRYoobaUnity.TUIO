@@ -12,6 +12,7 @@ namespace HRYooba.Library.Network
     {
         private bool _disposed = false;
         private CompositeDisposable _disposables = new CompositeDisposable();
+        private bool _isShowLog = false;
 
         private TuioServer _tuioServer = null;
         private BlobProcessor _blobProcessor = new BlobProcessor();
@@ -29,8 +30,10 @@ namespace HRYooba.Library.Network
         public IObservable<TuioPointData> OnPointUpdated => _onPointUpdated.ObserveOnMainThread();
         public IObservable<TuioPointData> OnPointRemoved => _onPointRemoved.ObserveOnMainThread();
 
-        public UnityTuioServer()
+        public UnityTuioServer(bool isShowLog = false)
         {
+            _isShowLog = isShowLog;
+
             _blobProcessor.BlobAdded += OnBlobAdded;
             _blobProcessor.BlobUpdated += OnBlobUpdated;
             _blobProcessor.BlobRemoved += OnBlobRemoved;
@@ -106,8 +109,7 @@ namespace HRYooba.Library.Network
             }
             catch (ArgumentException e)
             {
-                Debug.LogWarning($"[UnityTuioServer]: ID[{pointData.Id}] that already exists is about to be added.\n{e}");
-                throw e;
+                if (_isShowLog) Debug.LogWarning($"[UnityTuioServer]: ID[{pointData.Id}] that already exists is about to be added.\n{e}");
             }
         }
 
@@ -119,8 +121,7 @@ namespace HRYooba.Library.Network
             }
             catch (KeyNotFoundException e)
             {
-                Debug.LogWarning($"[UnityTuioServer]: ID[{pointData.Id}] not found.\n{e}");
-                throw e;
+                if (_isShowLog) Debug.LogWarning($"[UnityTuioServer]: ID[{pointData.Id}] not found.\n{e}");
             }
         }
 
@@ -130,9 +131,9 @@ namespace HRYooba.Library.Network
             {
                 _points.Remove(pointData.Id);
             }
-            catch
+            catch (KeyNotFoundException e)
             {
-                throw;
+                if (_isShowLog) Debug.LogWarning($"[UnityTuioServer]: ID[{pointData.Id}] not found.\n{e}");
             }
         }
 

@@ -25,5 +25,9 @@ namespace HRYooba.Library.Network
         {
             Position = position;
         }
+
+        public override bool Equals(object obj) => Equals(obj as TuioPointData);
+        public override int GetHashCode() => (Type, Id).GetHashCode();
+        public override string ToString() => $"Type: {Type}, Id: {Id}, Position: {Position}";
     }
 }

@@ -1,8 +1,9 @@
+using System;
 using UnityEngine;
 
 namespace HRYooba.Library.Network
 {
-    public class TuioPointData
+    public class TuioPointData : IEquatable<TuioPointData>
     {
         public TuioPointType Type { get; private set; }
         public int Id { get; private set; }
@@ -13,6 +14,11 @@ namespace HRYooba.Library.Network
             Type = type;
             Id = id;
             Position = position;
+        }
+
+        public bool Equals(TuioPointData other)
+        {
+            return Id == other.Id && Type == other.Type;
         }
 
         internal void UpdatePosition(Vector2 position)

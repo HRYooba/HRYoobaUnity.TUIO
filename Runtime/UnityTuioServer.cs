@@ -6,7 +6,7 @@ using TUIOsharp;
 using TUIOsharp.DataProcessors;
 using UniRx;
 
-namespace HRYooba.Library.Network
+namespace HRYooba.Library.TUIO
 {
     public class UnityTuioServer : IDisposable
     {

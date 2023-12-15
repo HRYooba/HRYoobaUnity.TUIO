@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace HRYooba.Library.Network
+namespace HRYooba.Library.TUIO
 {
     public class TuioPointData : IEquatable<TuioPointData>
     {

@@ -6,47 +6,46 @@ using TUIOsharp;
 using TUIOsharp.DataProcessors;
 using UniRx;
 
-namespace HRYooba.Library.TUIO
+namespace HRYooba.TUIO
 {
     public class UnityTuioServer : IDisposable
     {
         private bool _disposed = false;
-        private CompositeDisposable _disposables = new CompositeDisposable();
-        private bool _isShowLog = false;
+        private readonly CompositeDisposable _disposables = new CompositeDisposable();
+        private readonly Dictionary<int, TuioPointData> _points = new Dictionary<int, TuioPointData>();
 
+        // TUIO
         private TuioServer _tuioServer = null;
-        private BlobProcessor _blobProcessor = new BlobProcessor();
-        private CursorProcessor _cursorProcessor = new CursorProcessor();
-        private ObjectProcessor _objectProcessor = new ObjectProcessor();
+        private readonly BlobProcessor _blobProcessor = new BlobProcessor();
+        private readonly CursorProcessor _cursorProcessor = new CursorProcessor();
+        private readonly ObjectProcessor _objectProcessor = new ObjectProcessor();
 
-        private Dictionary<int, TuioPointData> _points = new Dictionary<int, TuioPointData>();
-
-        private Subject<TuioPointData> _onPointAdded = new Subject<TuioPointData>();
-        private Subject<TuioPointData> _onPointUpdated = new Subject<TuioPointData>();
-        private Subject<TuioPointData> _onPointRemoved = new Subject<TuioPointData>();
+        private readonly Subject<TuioPointData> _onPointAddedSubject = new Subject<TuioPointData>();
+        private readonly Subject<TuioPointData> _onPointUpdatedSubject = new Subject<TuioPointData>();
+        private readonly Subject<TuioPointData> _onPointRemovedSubject = new Subject<TuioPointData>();
 
         public IReadOnlyList<TuioPointData> Points => _points.Values.ToList();
-        public IObservable<TuioPointData> OnPointAdded => _onPointAdded.ObserveOnMainThread();
-        public IObservable<TuioPointData> OnPointUpdated => _onPointUpdated.ObserveOnMainThread();
-        public IObservable<TuioPointData> OnPointRemoved => _onPointRemoved.ObserveOnMainThread();
+        public IObservable<TuioPointData> OnPointAddedObservable => _onPointAddedSubject.ObserveOnMainThread();
+        public IObservable<TuioPointData> OnPointUpdatedObservable => _onPointUpdatedSubject.ObserveOnMainThread();
+        public IObservable<TuioPointData> OnPointRemovedObservable => _onPointRemovedSubject.ObserveOnMainThread();
 
-        public UnityTuioServer(bool isShowLog = false)
+        public UnityTuioServer()
         {
-            _isShowLog = isShowLog;
-
             _blobProcessor.BlobAdded += OnBlobAdded;
             _blobProcessor.BlobUpdated += OnBlobUpdated;
             _blobProcessor.BlobRemoved += OnBlobRemoved;
+
             _cursorProcessor.CursorAdded += OnCursorAdded;
             _cursorProcessor.CursorUpdated += OnCursorUpdated;
             _cursorProcessor.CursorRemoved += OnCursorRemoved;
+
             _objectProcessor.ObjectAdded += OnObjectAdded;
             _objectProcessor.ObjectUpdated += OnObjectUpdated;
             _objectProcessor.ObjectRemoved += OnObjectRemoved;
 
-            OnPointAdded.Subscribe(AddPointData).AddTo(_disposables);
-            OnPointUpdated.Subscribe(UpdatePointData).AddTo(_disposables);
-            OnPointRemoved.Subscribe(RemovePointData).AddTo(_disposables);
+            OnPointAddedObservable.Subscribe(AddPointData).AddTo(_disposables);
+            OnPointUpdatedObservable.Subscribe(UpdatePointData).AddTo(_disposables);
+            OnPointRemovedObservable.Subscribe(RemovePointData).AddTo(_disposables);
         }
 
         ~UnityTuioServer()
@@ -71,7 +70,6 @@ namespace HRYooba.Library.TUIO
             _disposed = true;
 
             _disposables.Dispose();
-            _disposables = null;
 
             if (_tuioServer != null)
             {
@@ -83,57 +81,40 @@ namespace HRYooba.Library.TUIO
             _blobProcessor.BlobAdded -= OnBlobAdded;
             _blobProcessor.BlobUpdated -= OnBlobUpdated;
             _blobProcessor.BlobRemoved -= OnBlobRemoved;
+
             _cursorProcessor.CursorAdded -= OnCursorAdded;
             _cursorProcessor.CursorUpdated -= OnCursorUpdated;
             _cursorProcessor.CursorRemoved -= OnCursorRemoved;
+
             _objectProcessor.ObjectAdded -= OnObjectAdded;
             _objectProcessor.ObjectUpdated -= OnObjectUpdated;
             _objectProcessor.ObjectRemoved -= OnObjectRemoved;
 
-            _onPointAdded.Dispose();
-            _onPointAdded = null;
-            _onPointUpdated.Dispose();
-            _onPointUpdated = null;
-            _onPointRemoved.Dispose();
-            _onPointRemoved = null;
+            _onPointAddedSubject.Dispose();
+            _onPointUpdatedSubject.Dispose();
+            _onPointRemovedSubject.Dispose();
 
             _points.Clear();
-            _points = null;
         }
 
         private void AddPointData(TuioPointData pointData)
         {
-            try
-            {
-                _points.Add(pointData.Id, pointData);
-            }
-            catch (ArgumentException e)
-            {
-                if (_isShowLog) Debug.LogWarning($"[UnityTuioServer]: ID[{pointData.Id}] that already exists is about to be added.\n{e}");
-            }
+            _points.TryAdd(pointData.Id, pointData);
         }
 
         private void UpdatePointData(TuioPointData pointData)
         {
-            try
+            if (_points.ContainsKey(pointData.Id))
             {
-                _points[pointData.Id].UpdatePosition(pointData.Position);
-            }
-            catch (KeyNotFoundException e)
-            {
-                if (_isShowLog) Debug.LogWarning($"[UnityTuioServer]: ID[{pointData.Id}] not found.\n{e}");
+                _points[pointData.Id].SetPosition(pointData.Position);
             }
         }
 
         private void RemovePointData(TuioPointData pointData)
         {
-            try
+            if (_points.ContainsKey(pointData.Id))
             {
                 _points.Remove(pointData.Id);
-            }
-            catch (KeyNotFoundException e)
-            {
-                if (_isShowLog) Debug.LogWarning($"[UnityTuioServer]: ID[{pointData.Id}] not found.\n{e}");
             }
         }
 
@@ -142,21 +123,21 @@ namespace HRYooba.Library.TUIO
         {
             var entity = e.Blob;
             var pointData = new TuioPointData(TuioPointType.Blob, entity.Id, new Vector2(entity.X, 1.0f - entity.Y));
-            _onPointAdded.OnNext(pointData);
+            _onPointAddedSubject.OnNext(pointData);
         }
 
         private void OnBlobUpdated(object sender, TuioBlobEventArgs e)
         {
             var entity = e.Blob;
             var pointData = new TuioPointData(TuioPointType.Blob, entity.Id, new Vector2(entity.X, 1.0f - entity.Y));
-            _onPointUpdated.OnNext(pointData);
+            _onPointUpdatedSubject.OnNext(pointData);
         }
 
         private void OnBlobRemoved(object sender, TuioBlobEventArgs e)
         {
             var entity = e.Blob;
             var pointData = new TuioPointData(TuioPointType.Blob, entity.Id, new Vector2(entity.X, 1.0f - entity.Y));
-            _onPointRemoved.OnNext(pointData);
+            _onPointRemovedSubject.OnNext(pointData);
         }
         #endregion
 
@@ -165,21 +146,21 @@ namespace HRYooba.Library.TUIO
         {
             var entity = e.Cursor;
             var pointData = new TuioPointData(TuioPointType.Cursor, entity.Id, new Vector2(entity.X, 1.0f - entity.Y));
-            _onPointAdded.OnNext(pointData);
+            _onPointAddedSubject.OnNext(pointData);
         }
 
         private void OnCursorUpdated(object sender, TuioCursorEventArgs e)
         {
             var entity = e.Cursor;
             var pointData = new TuioPointData(TuioPointType.Cursor, entity.Id, new Vector2(entity.X, 1.0f - entity.Y));
-            _onPointUpdated.OnNext(pointData);
+            _onPointUpdatedSubject.OnNext(pointData);
         }
 
         private void OnCursorRemoved(object sender, TuioCursorEventArgs e)
         {
             var entity = e.Cursor;
             var pointData = new TuioPointData(TuioPointType.Cursor, entity.Id, new Vector2(entity.X, 1.0f - entity.Y));
-            _onPointRemoved.OnNext(pointData);
+            _onPointRemovedSubject.OnNext(pointData);
         }
         #endregion
 
@@ -188,21 +169,21 @@ namespace HRYooba.Library.TUIO
         {
             var entity = e.Object;
             var pointData = new TuioPointData(TuioPointType.Object, entity.Id, new Vector2(entity.X, 1.0f - entity.Y));
-            _onPointAdded.OnNext(pointData);
+            _onPointAddedSubject.OnNext(pointData);
         }
 
         private void OnObjectUpdated(object sender, TuioObjectEventArgs e)
         {
             var entity = e.Object;
             var pointData = new TuioPointData(TuioPointType.Object, entity.Id, new Vector2(entity.X, 1.0f - entity.Y));
-            _onPointUpdated.OnNext(pointData);
+            _onPointUpdatedSubject.OnNext(pointData);
         }
 
         private void OnObjectRemoved(object sender, TuioObjectEventArgs e)
         {
             var entity = e.Object;
             var pointData = new TuioPointData(TuioPointType.Object, entity.Id, new Vector2(entity.X, 1.0f - entity.Y));
-            _onPointRemoved.OnNext(pointData);
+            _onPointRemovedSubject.OnNext(pointData);
         }
         #endregion
     }

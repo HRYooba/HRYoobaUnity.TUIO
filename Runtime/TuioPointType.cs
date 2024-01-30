@@ -1,4 +1,4 @@
-namespace HRYooba.Library.TUIO
+namespace HRYooba.TUIO
 {
     public enum TuioPointType
     {

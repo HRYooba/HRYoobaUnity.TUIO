@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace HRYooba.Library.TUIO
+namespace HRYooba.TUIO
 {
     public class TuioPointData : IEquatable<TuioPointData>
     {
@@ -21,7 +21,7 @@ namespace HRYooba.Library.TUIO
             return Id == other.Id && Type == other.Type;
         }
 
-        internal void UpdatePosition(Vector2 position)
+        internal void SetPosition(Vector2 position)
         {
             Position = position;
         }

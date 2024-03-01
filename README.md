@@ -1,24 +1,19 @@
 # HRYoobaUnityLibrary.TUIO
-https://github.com/valyard/TUIOsharp  
-こちらのリポジトリを参考に作成
-## 1.インストール
+## 1 インストール
+### 1.1 パッケージマネージャーの設定
 ProjectSetting/PackageManagerから以下のScopeRegistriesを設定
 - Name: `package.openupm.com`
 - URL: `https://package.openupm.com`
-- Scope: `com.hryooba.library`
+- Scope(s): 
+  - `com.hryooba`
+  - `com.cysharp`
 
+### 1.2 R3のインストール
+https://github.com/Cysharp/R3?tab=readme-ov-file#unity
+を参考にインストールする。 
+
+### 1.3 インストール
 PackageManagerからMyRegistriesを選択しパッケージを入れる。
 
-## 2.依存ライブラリ
-以下のスコープを追加してください。
-```json
-  "scopedRegistries": [
-    {
-      "name": "package.openupm.com",
-      "url": "https://package.openupm.com",
-      "scopes": [
-        "com.neuecc.unirx"
-      ]
-    }
-  ]
-```
+## 2 参考
+https://github.com/valyard/TUIOsharp

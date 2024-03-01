@@ -4,7 +4,7 @@ using System.Linq;
 using UnityEngine;
 using TUIOsharp;
 using TUIOsharp.DataProcessors;
-using UniRx;
+using R3;
 
 namespace HRYooba.TUIO
 {
@@ -25,9 +25,9 @@ namespace HRYooba.TUIO
         private readonly Subject<TuioPointData> _onPointRemovedSubject = new Subject<TuioPointData>();
 
         public IReadOnlyList<TuioPointData> Points => _points.Values.ToList();
-        public IObservable<TuioPointData> OnPointAddedObservable => _onPointAddedSubject.ObserveOnMainThread();
-        public IObservable<TuioPointData> OnPointUpdatedObservable => _onPointUpdatedSubject.ObserveOnMainThread();
-        public IObservable<TuioPointData> OnPointRemovedObservable => _onPointRemovedSubject.ObserveOnMainThread();
+        public Observable<TuioPointData> OnPointAddedObservable => _onPointAddedSubject.ObserveOnMainThread();
+        public Observable<TuioPointData> OnPointUpdatedObservable => _onPointUpdatedSubject.ObserveOnMainThread();
+        public Observable<TuioPointData> OnPointRemovedObservable => _onPointRemovedSubject.ObserveOnMainThread();
 
         public UnityTuioServer()
         {

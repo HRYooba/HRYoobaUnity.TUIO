@@ -12,5 +12,6 @@ ProjectSetting/PackageManagerから以下のScopeRegistriesを設定
 ### 1.2 インストール
 PackageManagerからMyRegistriesを選択しパッケージを入れる。
 
-## 2 参考
-https://github.com/valyard/TUIOsharp
+## 2 外部ライブラリ
+このプロジェクトは[TUIOsharp](https://github.com/valyard/TUIOsharp)を使用しており、該当部分にはオリジナルのライセンスが適用されています。  
+詳細については[license.txt](https://github.com/HRYooba/HRYoobaUnity.TUIO/blob/main/Runtime/Plugins/TUIOsharp/license.txt), [License.txt](https://github.com/HRYooba/HRYoobaUnity.TUIO/blob/main/Runtime/Plugins/OSCsharp/License.txt)ファイルを参照してください。
